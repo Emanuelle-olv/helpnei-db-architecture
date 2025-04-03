@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: mysql_helpnei
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: helpnei
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d  # mounts all .sql scripts   # monta todos os scripts .sql
+      - ./my.cnf:/etc/mysql/conf.d/my.cnf  # enables the event scheduler after restart    # ativa o event scheduler após restart
+      - mysql_data:/var/lib/mysql          # data persistence     # persistência dos dados
+
+volumes:
+  mysql_data:
