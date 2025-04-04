@@ -109,6 +109,17 @@ All scripts are versioned and isolated for clarity.
 
 ---
 
+### 📁 Documentation
+
+Additional technical instructions for backend and Prisma integration are located in the [`/docs`](./docs) folder:
+
+- [`backend_instructions.md`](./docs/backend_instructions.md) – Backend responsibilities when using **MySQL triggers** and **event schedulers**.
+- [`prisma_instructions.md`](./docs/prisma_instructions.md) – How to use **Prisma ORM** with this database, including schema generation and query examples for SQL views.
+
+These files provide step-by-step guidance for integrating this architecture with Node.js backends using Prisma.
+
+---
+
 ## 🧠 Designed By
 
 This model was fully developed and documented by **Emanuelle Oliveira**, as a personal portfolio project and academic submission.
