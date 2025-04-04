@@ -48,6 +48,32 @@ END;
 
 DELIMITER ;
 
+-- Trigger: Automatically sets the end_date in owner_sponsor_plan based on the plan's duration
+-- Trigger: Define automaticamente o end_date na tabela owner_sponsor_plan com base na duração do plano
+
+DELIMITER //
+
+CREATE TRIGGER trg_set_end_date
+BEFORE INSERT ON owner_sponsor_plan
+FOR EACH ROW
+BEGIN
+    DECLARE v_duration INT;
+
+    -- Fetch the duration (in months) from the planData table linked to the selected sponsor_plan
+    -- Busca a duração (em meses) da tabela planData vinculada ao sponsor_plan selecionado
+    SELECT pd.duration_months INTO v_duration
+    FROM sponsor_plan sp
+    JOIN planData pd ON sp.planData_id = pd.id_planData
+    WHERE sp.id_sponsor_plan = NEW.sponsor_plan_id;
+
+    -- Calculate the end_date by adding duration to start_date
+    -- Calcula o end_date somando a duração ao start_date
+    SET NEW.end_date = DATE_ADD(NEW.start_date, INTERVAL v_duration MONTH);
+END;
+//
+
+
+DELIMITER ;
 
 -- Trigger: Automatically sets expiration_date (+3 days
 -- Trigger: Define expiration_date automaticamente (+3 dias)
@@ -72,19 +98,7 @@ BEGIN
 END;
 //
 
--- Trigger: Increases available slots if a selection is deleted and was approved
--- Trigger: Incrementa vagas se seleção for deletada e aprovada
-CREATE TRIGGER trg_increment_slot_on_delete
-BEFORE DELETE ON sponsorship_selection
-FOR EACH ROW
-BEGIN
-    IF OLD.status_selection = 'approved' THEN
-        UPDATE sponsorship_slot
-        SET slot_quantity_available = slot_quantity_available + 1
-        WHERE id_slot = OLD.slot_id;
-    END IF;
-END;
-//
+
 
 -- Trigger: Prevents a new registration with the same CPF within 30 days
 -- Trigger : Impede novo cadastro com mesmo CPF em menos de 30 dias
@@ -109,14 +123,28 @@ END;
 -- Ativa o Event Scheduler
 SET GLOBAL event_scheduler = ON;
 
--- Event Scheduler: automatically rejects expired selections
--- Event Scheduler: rejeita automaticamente seleções expiradas
+-- Event Scheduler: automatically rejects expired selections and releases the reserved slot
+-- Event Scheduler: rejeita automaticamente seleções expiradas e libera a vaga reservada 
+DELIMITER //
 CREATE EVENT IF NOT EXISTS ev_auto_reject_expired
 ON SCHEDULE EVERY 1 HOUR
 DO
-  UPDATE sponsorship_selection
-  SET status_selection = 'rejected'
-  WHERE status_selection = 'pending' AND expiration_date < NOW();
-//
+BEGIN
+    -- Step 1: Mark as 'rejected' all selections that are in 'pending' status and have passed the deadline
+    -- Passo 1: Marca como 'rejected' todas as seleções que estão com status 'pending' e passaram do prazo
+    UPDATE sponsorship_selection
+    SET status_selection = 'rejected'
+    WHERE status_selection = 'pending' AND expiration_date < NOW();
 
+    -- Step 2: Return slot to availability
+    -- Passo 2: Para cada seleção rejeitada, devolve 1 vaga ao slot correspondente
+    UPDATE sponsorship_slot
+    SET slot_quantity_available = slot_quantity_available + 1
+    WHERE id_slot IN (
+        SELECT slot_id
+        FROM sponsorship_selection
+        WHERE status_selection = 'rejected' AND expiration_date < NOW()
+    );
+END;
+//
 DELIMITER ;

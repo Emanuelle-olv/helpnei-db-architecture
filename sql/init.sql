@@ -168,7 +168,7 @@ CREATE TABLE sponsorship_selection (
     id_selection INT PRIMARY KEY AUTO_INCREMENT,
     cap_candidate_id INT,
     slot_id INT,
-    status_selection VARCHAR(20) DEFAULT 'pending',
+    status_selection ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
     selection_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     expiration_date DATETIME,
     FOREIGN KEY (cap_candidate_id) REFERENCES capture_candidate(id_cap_candidate),
