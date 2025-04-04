@@ -86,9 +86,7 @@ FROM owner_sponsor_plan osp
 LEFT JOIN users u_final ON u_final.owner_id = osp.owner_id
                         AND u_final.user_date BETWEEN osp.start_date AND osp.end_date
 LEFT JOIN owner_community oc ON oc.owner_id = osp.owner_id
-LEFT JOIN usuario_community uc ON uc.community_id = oc.community_id
+LEFT JOIN users_community uc ON uc.community_id = oc.community_id
 LEFT JOIN users u2 ON u2.id_user = uc.user_id
                    AND u2.user_date BETWEEN osp.start_date AND osp.end_date
 GROUP BY osp.id_owner_sponsor_plan, osp.owner_id;
-
-

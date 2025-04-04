@@ -120,7 +120,7 @@ CREATE TABLE owner_community (
     FOREIGN KEY (community_id) REFERENCES community(id_community)
 );
 
-CREATE TABLE usuario_community (
+CREATE TABLE users_community (
     user_id INT,
     community_id INT,
     PRIMARY KEY (user_id, community_id),

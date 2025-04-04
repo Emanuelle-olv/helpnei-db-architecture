@@ -103,7 +103,7 @@ model User {
   owner_id   Int?
   user_date  DateTime?
   owner      Owner?    @relation(fields: [owner_id], references: [id_owner])
-  usuario_community UsuarioCommunity[]
+  users_community usersCommunity[]
 }
 
 model Community {
@@ -135,7 +135,7 @@ model OwnerCommunity {
   @@id([owner_id, community_id])
 }
 
-model UsuarioCommunity {
+model usersCommunity {
   user_id      Int
   community_id Int
 
