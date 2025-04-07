@@ -1,6 +1,4 @@
-
 // schema.prisma
-
 
 generator client {
   provider = "prisma-client-js"
@@ -16,58 +14,59 @@ datasource db {
 // ----------------------
 
 model Sponsor {
-  id_sponsor           Int              @id @default(autoincrement())
-  nameSponsor          String?
-  descriptionSponsor   String?
-  descriptionTitle     String?
-  exclusiveUrl         String?
-  site_web             String?
-  facebook             String?
-  instagram            String?
-  linkedin             String?
-  tiktok               String?
-  kawai                String?
-  whatsapp             String?
-  x                    String?
-  lowSponsorLogo       String?
-  highSponsorLogo      String?
-  urlSponsor           String?
-  sponsor_plan         SponsorPlan[]
+  id_sponsor         Int             @id @default(autoincrement())
+  nameSponsor        String?
+  descriptionSponsor String?
+  descriptionTitle   String?
+  exclusiveUrl       String?
+  site_web           String?
+  facebook           String?
+  instagram          String?
+  linkedin           String?
+  tiktok             String?
+  kawai              String?
+  whatsapp           String?
+  x                  String?
+  lowSponsorLogo     String?
+  highSponsorLogo    String?
+  urlSponsor         String?
+  sponsor_plan       SponsorPlan[]
 }
 
 model PlanData {
-  id_planData         Int            @id @default(autoincrement())
-  planName            String?        @db.VarChar(20)
-  planActive          Boolean?
-  productsPerStore    Int?
-  storeQuantity       Int?
-  comunityQuantity    Int?
-  price               Decimal?       @db.Decimal(10,2)
-  duration_months     Int?
-  sponsor_plan        SponsorPlan[]
+  id_planData       Int             @id @default(autoincrement())
+  planName          String?         @db.VarChar(20)
+  planActive        Boolean?
+  productsPerStore  Int?
+  storeQuantity     Int?
+  comunityQuantity  Int?
+  price             Decimal?        @db.Decimal(10,2)
+  duration_months   Int?
+  sponsor_plan      SponsorPlan[]
 }
 
 model SponsorPlan {
-  id_sponsor_plan     Int              @id @default(autoincrement())
+  id_sponsor_plan     Int                @id @default(autoincrement())
   sponsor_id          Int
   planData_id         Int
   quantity_purchased  Int
+  purchased_date      DateTime?
 
-  sponsor             Sponsor         @relation(fields: [sponsor_id], references: [id_sponsor])
-  planData            PlanData        @relation(fields: [planData_id], references: [id_planData])
+  sponsor             Sponsor           @relation(fields: [sponsor_id], references: [id_sponsor])
+  planData            PlanData          @relation(fields: [planData_id], references: [id_planData])
   owner_sponsor_plan  OwnerSponsorPlan[]
   sponsorship_slot    SponsorshipSlot[]
 }
 
 model Owner {
-  id_owner       Int               @id @default(autoincrement())
-  storeOwnerId   String?
-  owner_name     String?
-  stores         Store[]
-  users          User[]
-  communities    Community[]
-  owner_plan     OwnerSponsorPlan[]
-  owner_community OwnerCommunity[]
+  id_owner         Int               @id @default(autoincrement())
+  storeOwnerId     String?
+  owner_name       String?
+  stores           Store[]
+  users            User[]
+  communities      Community[]
+  owner_plan       OwnerSponsorPlan[]
+  owner_community  OwnerCommunity[]
 }
 
 model OwnerSponsorPlan {
@@ -126,11 +125,12 @@ model Community {
 }
 
 model OwnerCommunity {
-  owner_id     Int
-  community_id Int
+  owner_id          Int
+  community_id      Int
+  registration_date DateTime?
 
-  owner        Owner     @relation(fields: [owner_id], references: [id_owner])
-  community    Community @relation(fields: [community_id], references: [id_community])
+  owner             Owner     @relation(fields: [owner_id], references: [id_owner])
+  community         Community @relation(fields: [community_id], references: [id_community])
 
   @@id([owner_id, community_id])
 }
@@ -154,6 +154,7 @@ model CaptureCandidate {
   full_name            String
   cpf                  String    @db.VarChar(11)
   birth_date           DateTime?
+  candidate_age        Int?
   gender               String?   @db.VarChar(1)
   street               String?
   number               String?
@@ -164,8 +165,8 @@ model CaptureCandidate {
   family_income        Decimal?  @db.Decimal(10,2)
   email                String?   @db.VarChar(30)
   education_level      String?   @db.VarChar(20)
-  status               String?   @db.VarChar(10)
   notification_method  String?   @db.VarChar(10)
+  postal_code          String?   @db.VarChar(8)
   created_at           DateTime  @default(now())
 
   sponsorship_selection SponsorshipSelection[]
@@ -179,6 +180,7 @@ model SponsorshipSlot {
   slot_max_income           Decimal?  @db.Decimal(10,2)
   slot_min_education_level  String?   @db.VarChar(20)
   slot_quantity_available   Int?
+  slot_age                  Int?
 
   sponsor_plan              SponsorPlan @relation(fields: [sponsor_plan_id], references: [id_sponsor_plan])
   sponsorship_selection     SponsorshipSelection[]
