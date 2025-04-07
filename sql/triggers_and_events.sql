@@ -119,6 +119,18 @@ END;
 //
 
 
+--  Trigger to calculate age at insert
+--  Trigger que define candidate_age no momento do cadastro
+DELIMITER //
+CREATE TRIGGER trg_set_candidate_age
+BEFORE INSERT ON capture_candidate
+FOR EACH ROW
+BEGIN
+  SET NEW.candidate_age = TIMESTAMPDIFF(YEAR, NEW.birth_date, CURDATE());
+END;
+//
+DELIMITER ;
+
 -- Enables the Event Scheduler
 -- Ativa o Event Scheduler
 SET GLOBAL event_scheduler = ON;
@@ -145,6 +157,21 @@ BEGIN
         FROM sponsorship_selection
         WHERE status_selection = 'rejected' AND expiration_date < NOW()
     );
+END;
+//
+DELIMITER ;
+
+--  Scheduled event to update candidate_age daily
+--  Evento agendado para atualizar candidate_age diariamente após aniversário
+DELIMITER //
+CREATE EVENT IF NOT EXISTS ev_update_candidate_age
+ON SCHEDULE EVERY 1 DAY
+STARTS CURRENT_TIMESTAMP + INTERVAL 1 DAY
+DO
+BEGIN
+  UPDATE capture_candidate
+  SET candidate_age = TIMESTAMPDIFF(YEAR, birth_date, CURDATE())
+  WHERE birth_date IS NOT NULL;
 END;
 //
 DELIMITER ;

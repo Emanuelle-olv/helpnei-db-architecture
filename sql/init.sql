@@ -41,6 +41,7 @@ CREATE TABLE sponsor_plan (
     sponsor_id INT NOT NULL,
     planData_id INT NOT NULL,
     quantity_purchased INT NOT NULL,
+    purchased_date DATETIME,
 
     FOREIGN KEY (sponsor_id) REFERENCES sponsor(id_sponsor),
     FOREIGN KEY (planData_id) REFERENCES planData(id_planData)
@@ -115,6 +116,7 @@ CREATE TABLE community (
 CREATE TABLE owner_community (
     owner_id INT,
     community_id INT,
+    registration_date DATETIME,
     PRIMARY KEY (owner_id, community_id),
     FOREIGN KEY (owner_id) REFERENCES owner(id_owner),
     FOREIGN KEY (community_id) REFERENCES community(id_community)
@@ -136,6 +138,7 @@ CREATE TABLE capture_candidate (
     full_name VARCHAR(100) NOT NULL,
     cpf VARCHAR(11) NOT NULL,
     birth_date DATE,
+    candidate_age INT,
     gender VARCHAR(1),
     street VARCHAR(100),
     number VARCHAR(10),
@@ -146,8 +149,8 @@ CREATE TABLE capture_candidate (
     family_income DECIMAL(10,2),
     email VARCHAR(30),
     education_level VARCHAR(20),
-    status VARCHAR(10),
     notification_method VARCHAR(10),
+    postal_code VARCHAR(8),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -160,6 +163,7 @@ CREATE TABLE sponsorship_slot (
     slot_max_income DECIMAL(10,2),
     slot_min_education_level VARCHAR(20),
     slot_quantity_available INT,
+    slot_min_age INT, 
     FOREIGN KEY (sponsor_plan_id) REFERENCES sponsor_plan(id_sponsor_plan)
 );
 
